@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grade 5 Unit 6 Starting Out</title>
+
+    <style>
+      body {
+        background-image: url("assets/winter/winter.jpg");
+        background-size: cover;
+        background-position: center;
+        background-color: #002b36;
+        color: #eee8d5;
+        font-family: "Comic Sans MS", "Comic Sans", cursive;
+        text-align: center;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .page {
+        background: #b4cde6;
+        padding: 30px;
+        border: 4px solid #268bd2;
+        width: 90%;
+        max-width: 800px;
+      }
+      .page h1 {
+        color: #268bd2;
+      }
+      .page h2 {
+        color: #268bd2;
+      }
+      .hidden {
+        display: none !important;
+      }
+
+      #japanese-text {
+        font-size: 30px;
+        color: #005eb8;
+        margin-bottom: 5px;
+        font-weight: bold;
+        background-color: yellow;
+      }
+      #question-text {
+        font-size: 50px;
+        line-height: 1.1;
+        margin: 10px 0;
+        color: black;
+        font-weight: bold;
+      }
+
+      /* Style para sa Question Image */
+      #question-image {
+        max-width: 250px;
+        max-height: 180px;
+        width: auto;
+        height: auto;
+        margin: 10px auto;
+        border-radius: 8px;
+        border: 2px solid #586e75;
+        display: block;
+      }
+
+      /* Style para sa Text Hint */
+      #hint-display {
+        font-size: 1.5rem;
+        color: #2aa198;
+        background-color: #fada5f;
+        padding: 8px 15px;
+        border-radius: 6px;
+        display: inline-block;
+        margin: 10px 0;
+        border: 1px dashed #2aa198;
+      }
+
+      #score-board {
+        font-size: 1.5rem;
+        color: #b58900;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      .chest-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+        justify-items: center;
+      }
+      .chest-btn {
+        width: 180px;
+        height: 180px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        border: none;
+        cursor: pointer;
+        background-color: transparent;
+      }
+
+      button {
+        background: #268bd2;
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 1.2rem;
+        font-family: "Comic Sans MS", "Comic Sans", cursive;
+      }
+
+      .btn-hint {
+        color: #002b36;
+        background: #fada5f;
+        margin-right: 10px;
+      }
+
+      .btn-quit {
+        background: #dc322f;
+        margin-top: 20px;
+      }
+      /* Cursor pointer para halatang pwedeng i-click ang picture */
+      #question-image {
+        cursor: pointer;
+      }
+
+      /* Modal para sa malaking picture */
+      #image-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 20px;
+      }
+
+      #image-modal img {
+        max-width: 92vw;
+        max-height: 88vh;
+        width: auto;
+        height: auto;
+        border-radius: 10px;
+        border: 3px solid #eee8d5;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      }
+
+      #close-modal {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        background: #dc322f;
+        color: white;
+        font-size: 2rem;
+        line-height: 1;
+        padding: 8px 16px;
+        border-radius: 8px;
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="page-start" class="page">
+      <h1 style="font-size: 60px">UNIT 6<br />STARTING OUT</h1>
+      <button onclick="showPage('page-rules')">HOW TO PLAY</button><br />
+      <button
+        onclick="
+          initGame('normal');
+          showPage('page-quiz');
+        "
+      >
+        PLAY</button
+      ><br />
+      <button
+        style="background: #859900"
+        onclick="
+          initGame('extra');
+          showPage('page-quiz');
+        "
+      >
+        EXTRA CHALLENGE
+      </button>
+    </div>
+
+    <div id="page-rules" class="page hidden">
+      <h2>RULES</h2>
+      <p>
+        Answer correctly to open a chest! <br />正しく答えて、宝箱を開けよう！
+      </p>
+      <button onclick="showPage('page-start')">BACK</button>
+    </div>
+
+    <div id="page-quiz" class="page hidden">
+      <div id="score-board">
+        Question: <span id="q-current"></span> / <span id="q-total"></span>
+      </div>
+
+      <!-- Question Image (Nakalabas agad kung may image) -->
+      <img
+        id="question-image"
+        class="hidden"
+        alt="Question Image"
+        onclick="openImageModal()"
+      />
+
+      <div id="japanese-text"></div>
+      <div id="question-text"></div>
+
+      <!-- Lalabas dito ang Text Hint kapag clinic ang HINT button -->
+      <div id="hint-display" class="hidden"></div>
+
+      <div>
+        <!-- Hint Button -->
+        <button id="btn-hint" class="btn-hint" onclick="showHint()">
+          💡 HINT
+        </button>
+
+        <!-- Reveal Answer Button -->
+        <button id="btn-reveal" onclick="revealAnswer(false)">
+          REVEAL ANSWER
+        </button>
+      </div>
+
+      <div id="answer-section" class="hidden">
+        <div>
+          <h1
+            id="answer-text"
+            style="
+              color: white;
+              background-color: #009961;
+              padding: 10px 20px;
+              border-radius: 8px;
+              display: inline-block;
+              font-size: 2.4rem;
+            "
+          ></h1>
+        </div>
+        <button id="btn-win" onclick="showPage('page-chest')">
+          CHOOSE A CHEST
+        </button>
+        <button id="btn-next" class="hidden" onclick="checkGameOver()">
+          NEXT QUESTION
+        </button>
+      </div>
+      <br /><button class="btn-quit" onclick="quitGame()">QUIT GAME</button>
+    </div>
+
+    <div id="page-chest" class="page hidden">
+      <h2>CHOOSE A CHEST</h2>
+      <div class="chest-grid">
+        <button
+          class="chest-btn"
+          style="background-image: url(assets/winter/dog_snowman.png)"
+          onclick="win()"
+        ></button>
+        <button
+          class="chest-btn"
+          style="background-image: url(assets/winter/cat_snowman.png)"
+          onclick="win()"
+        ></button>
+        <button
+          class="chest-btn"
+          style="background-image: url(assets/winter/elephant_snowman.png)"
+          onclick="win()"
+        ></button>
+        <button
+          class="chest-btn"
+          style="background-image: url(assets/winter/rabbit_snowman.png)"
+          onclick="win()"
+        ></button>
+      </div>
+    </div>
+
+    <div id="page-reward" class="page hidden">
+      <h2 id="win-text" style="font-size: 2.5rem">YOU WON!</h2>
+      <div
+        id="win-icon"
+        style="
+          width: 200px;
+          height: 200px;
+          background-size: contain;
+          background-repeat: no-repeat;
+          margin: 0 auto;
+        "
+      ></div>
+      <p
+        id="reward-desc"
+        style="font-size: 2.5rem; margin: 20px; color: #002b36"
+      ></p>
+      <button onclick="checkGameOver()">NEXT QUESTION</button>
+    </div>
+
+    <div id="page-end" class="page hidden">
+      <h1 id="end-title" style="font-size: 3rem">GAME OVER</h1>
+      <p id="end-msg">Thanks for playing!</p>
+      <button onclick="showPage('page-start')">RESTART</button>
+    </div>
+
+    <div id="image-modal" class="hidden" onclick="closeImageModal(event)">
+      <button id="close-modal" type="button" onclick="closeImageModal()">
+        &times;
+      </button>
+      <img id="modal-image" alt="Enlarged Question Image" />
+    </div>
+
+    <script>
+      // Audio Setup
+      const bgMusic = new Audio("assets/bg_music.mp3");
+      const chestSound = new Audio("assets/chest_sound.mp3");
+      const tickSound = new Audio("assets/tick_sound.mp3");
+      const timeoutSound = new Audio("assets/timeout_sound.mp3");
+      const revealSound = new Audio("assets/reveal_sound.mp3");
+      const winSound = new Audio("assets/win_sound.mp3");
+      bgMusic.loop = true;
+
+      // DATA (May dagdag na 'hintText' sa bawat tanong)
+      const questions = [
+        {
+          j: "絵を見てください。ソフィアと家族はどこにいますか。",
+          qNormal: "Look at the picture. Where is Sophia and her family at?",
+          aNormal: "They are at a Japanese restaurant",
+          img: "assets/imageQ/G5U6 Starting Out/pictureA.png",
+        },
+        {
+          j: "ソフィアを見てください。何を食べていますか。",
+          qNormal: "Look at Sophia. What is she eating?",
+          aNormal: "She is eating a beef bowl",
+          img: "assets/imageQ/G5U6 Starting Out/PictureB.png",
+        },
+        {
+          j: "ソフィアのお兄さんのオリバーを見てください。何を食べていますか。",
+          qNormal: "Look at Sophia's brother, Oliver. What is he eating?",
+          aNormal: "He is eating a fried noodles.",
+          img: "assets/imageQ/G5U6 Starting Out/PictureB.png",
+        },
+        {
+          j: "おじいさんを見てください。何をしていますか。",
+          qNormal: "Look at the old man. What is he doing.",
+          aNormal: "He is paying the bill.",
+          img: "assets/imageQ/G5U6 Starting Out/PictureC.png",
+        },
+        {
+          j: "店員さんを見てください。何を持っていますか。",
+          qNormal: "Look at the staff. What is she holding",
+          aNormal: "She is holding an English menu.",
+          img: "assets/imageQ/G5U6 Starting Out/pictureD.png",
+        },
+
+        // {
+        //   j: "2. さいがい",
+        //   qNormal: "災害",
+        //   aNormal: "disaster",
+        //   img: "", // Kung walang picture, iwanan lang na blanko ("") o tanggalin ang property
+        // },
+      ];
+
+      const rewards = {
+        ROW: {
+          img: "row.png",
+          desc: "All row sits down<br>(横の列の全員が座る)",
+        },
+        LINE: {
+          img: "line.png",
+          desc: "All column sits down<br>(縦の列の全員が座る)",
+        },
+        "CRISS CROSS": {
+          img: "crisscross.png",
+          desc: "Diagonal sits<br>(横と縦の列の全員が座れる)",
+        },
+        "ONLY ME": { img: "onlyme.png", desc: "You sit<br>(あなただけ座る)" },
+        BOYS: {
+          img: "boys.png",
+          desc: "All boys sit down and all girls stand up<br>(男の子全員が座り、女の子全員が立つ)",
+        },
+        GIRLS: {
+          img: "girls.png",
+          desc: "All girls sit down and all boys stand up<br>(女の子全員が座り、男の子全員が立つ)",
+        },
+        "JANKEN BATTLE": {
+          img: "janken.jpg",
+          desc: "Play rock, scissors, paper. You and other who wins or is draw, sit down. <br>(じゃんけんをします。あなたに勝った人か、あいこの人は座ることができます。)",
+        },
+        REVERSE: {
+          img: "reverse.png",
+          desc: "Students sitting down stand up while students standing up sit down <br>(すわっている人は立って、立っている人はすわってください。)",
+        },
+        // "REVERSE ROW": {
+        //   img: "reverserow.png",
+        //   desc: "Everyone sits down except row group <br>(答えた人の列以外は、みんな座りましょう。)",
+        // },
+        // "REVERSE LINE": {
+        //   img: "reverseline.png",
+        //   desc: "Everyone sits down except line group <br>(答えた人の縦の列以外は、みんな座りましょう。)",
+        // },
+        // "JANUARY STUDENTS": {
+        //   img: "january.png",
+        //   desc: "Everyone sits down except those whose birthday starts in JANUARY <br>(誕生日が１月の人以外は、みんな座りましょう。)",
+        // },
+        // "FEBRUARY STUDENTS": {
+        //   img: "february.png",
+        //   desc: "Everyone sits down except those whose birthday starts in FEBRUARY <br>(誕生日が２月の人以外は、みんな座りましょう。)",
+        // },
+        // "MARCH STUDENTS": {
+        //   img: "march.png",
+        //   desc: "Everyone sits down except those whose birthday starts in MARCH <br>(誕生日が3月の人以外は、みんな座りましょう。)",
+        // },
+        // "APRIL STUDENTS": {
+        //   img: "april.png",
+        //   desc: "Everyone sits down except those whose birthday starts in APRIL <br>(誕生日が4月の人以外は、みんな座りましょう。)",
+        // },
+        // "MAY STUDENTS": {
+        //   img: "may.png",
+        //   desc: "Everyone sits down except those whose birthday starts in MAY <br>(誕生日が5月の人以外は、みんな座りましょう。)",
+        // },
+        // "JUNE STUDENTS": {
+        //   img: "june.png",
+        //   desc: "Everyone sits down except those whose birthday starts in JUNE <br>(誕生日が6月の人以外は、みんな座りましょう。)",
+        // },
+        // "JULY STUDENTS": {
+        //   img: "july.png",
+        //   desc: "Everyone sits down except those whose birthday starts in JULY <br>(誕生日が7月の人以外は、みんな座りましょう。)",
+        // },
+        // "AUGUST STUDENTS": {
+        //   img: "august.png",
+        //   desc: "Everyone sits down except those whose birthday starts in AUGUST <br>(誕生日が8月の人以外は、みんな座りましょう。)",
+        // },
+        // "SEPTEMBER STUDENTS": {
+        //   img: "september.png",
+        //   desc: "Everyone sits down except those whose birthday starts in SEPTEMBER <br>(誕生日が9月の人以外は、みんな座りましょう。)",
+        // },
+        // "OCTOBER STUDENTS": {
+        //   img: "october.png",
+        //   desc: "Everyone sits down except those whose birthday starts in OCTOBER <br>(誕生日が10月の人以外は、みんな座りましょう。)",
+        // },
+        // "NOVEMBER STUDENTS": {
+        //   img: "november.png",
+        //   desc: "Everyone sits down except those whose birthday starts in NOVEMBER <br>(誕生日が11月の人以外は、みんな座りましょう。)",
+        // },
+        // "DECEMBER STUDENTS": {
+        //   img: "december.png",
+        //   desc: "Everyone sits down except those whose birthday starts in DECEMBER <br>(誕生日が1２月の人以外は、みんな座りましょう。)",
+        // },
+      };
+
+      let timer,
+        timeLeft = "",
+        currentQCount = 1,
+        totalQuestions = 0,
+        currentMode = "normal",
+        currentPool = [],
+        currentQuestion = null;
+
+      function stopAllSounds() {
+        [bgMusic, chestSound, tickSound, timeoutSound].forEach((s) => {
+          s.pause();
+          s.currentTime = 0;
+        });
+      }
+
+      function initGame(mode, num) {
+        currentMode = mode;
+        totalQuestions = num || questions.length;
+        currentQCount = 1;
+
+        if (mode === "extra") {
+          // Extra Challenge: Naka-randomize
+          currentPool = [...questions].sort(() => Math.random() - 0.5);
+        } else {
+          // Normal Mode: Sunod-sunod (In-order). Ginamit natin ang reverse para magamit ang .pop()
+          currentPool = [...questions].reverse();
+        }
+
+        document.getElementById("q-total").innerText = totalQuestions;
+        document.getElementById("q-current").innerText = currentQCount;
+
+        bgMusic.play().catch((e) => console.log("Music blocked:", e));
+        loadQuestion();
+      }
+
+      function win() {
+        chestSound.play().catch(() => {});
+        const keys = Object.keys(rewards);
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        const reward = rewards[randomKey];
+
+        document.getElementById("win-text").innerText = randomKey;
+        document.getElementById("win-icon").style.backgroundImage =
+          `url('assets/${reward.img}')`;
+        document.getElementById("reward-desc").innerHTML = reward.desc;
+
+        setTimeout(() => winSound.play().catch(() => {}), 500);
+        showPage("page-reward");
+      }
+
+      function quitGame() {
+        stopTimer();
+        stopAllSounds();
+        showPage("page-end");
+      }
+
+      function loadQuestion() {
+        currentQuestion = currentPool.pop();
+        if (!currentQuestion) {
+          quitGame();
+          return;
+        }
+
+        if (currentMode === "extra") {
+          document.getElementById("japanese-text").innerText =
+            currentQuestion.jExtra || "";
+          document.getElementById("question-text").innerText =
+            currentQuestion.qExtra || "";
+          document.getElementById("answer-text").innerText =
+            currentQuestion.aExtra || "";
+        } else {
+          document.getElementById("japanese-text").innerText =
+            currentQuestion.j;
+          document.getElementById("question-text").innerText =
+            currentQuestion.qNormal;
+          document.getElementById("answer-text").innerText =
+            currentQuestion.aNormal;
+        }
+
+        // --- Kinokontrol ang Picture (Lalabas agad sa simula) ---
+        const imgElement = document.getElementById("question-image");
+        if (currentQuestion.img && currentQuestion.img.trim() !== "") {
+          imgElement.src = currentQuestion.img;
+          imgElement.classList.remove("hidden");
+        } else {
+          imgElement.src = "";
+          imgElement.classList.add("hidden");
+        }
+
+        // --- I-reset ang Hint Text display ---
+        const hintDisplay = document.getElementById("hint-display");
+        const hintBtn = document.getElementById("btn-hint");
+        hintDisplay.classList.add("hidden");
+        hintDisplay.innerText = "";
+
+        // Ipakita ang Hint Button kung may hintText sa data
+        if (
+          currentQuestion.hintText &&
+          currentQuestion.hintText.trim() !== ""
+        ) {
+          hintBtn.classList.remove("hidden");
+        } else {
+          hintBtn.classList.add("hidden");
+        }
+
+        document.getElementById("btn-reveal").classList.remove("hidden");
+        document.getElementById("answer-section").classList.add("hidden");
+      }
+
+      // Function para lumabas ang Text Hint kapag pinindot ang button
+      function showHint() {
+        const hintDisplay = document.getElementById("hint-display");
+        if (currentQuestion && currentQuestion.hintText) {
+          hintDisplay.innerText = "💡 Hint: " + currentQuestion.hintText;
+          hintDisplay.classList.remove("hidden");
+        }
+        document.getElementById("btn-hint").classList.add("hidden");
+      }
+      function openImageModal() {
+        const qImg = document.getElementById("question-image");
+        const modalImg = document.getElementById("modal-image");
+        if (!qImg.src || qImg.classList.contains("hidden")) return;
+
+        modalImg.src = qImg.src;
+        document.getElementById("image-modal").classList.remove("hidden");
+      }
+
+      function closeImageModal(event) {
+        if (
+          !event ||
+          event.target.id === "image-modal" ||
+          event.target.id === "close-modal"
+        ) {
+          document.getElementById("image-modal").classList.add("hidden");
+          document.getElementById("modal-image").src = "";
+        }
+      }
+
+      function stopTimer() {
+        clearInterval(timer);
+      }
+
+      function revealAnswer(isTimeout) {
+        pauseMusic();
+        if (!isTimeout) {
+          revealSound.play().catch(() => {});
+        }
+
+        stopTimer();
+        document.getElementById("btn-reveal").classList.add("hidden");
+        document.getElementById("btn-hint").classList.add("hidden");
+        document.getElementById("answer-section").classList.remove("hidden");
+
+        const btnWin = document.getElementById("btn-win");
+        const btnNext = document.getElementById("btn-next");
+
+        if (isTimeout) {
+          btnWin.classList.add("hidden");
+          btnNext.classList.remove("hidden");
+        } else {
+          btnWin.classList.remove("hidden");
+          btnNext.classList.add("hidden");
+        }
+      }
+
+      function showPage(pageId) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.add("hidden"));
+        document.getElementById(pageId).classList.remove("hidden");
+      }
+
+      function checkGameOver() {
+        if (currentQCount >= totalQuestions) {
+          quitGame();
+        } else {
+          currentQCount++;
+          document.getElementById("q-current").innerText = currentQCount;
+          loadQuestion();
+          bgMusic.play().catch(() => {});
+          showPage("page-quiz");
+        }
+      }
+
+      function pauseMusic() {
+        bgMusic.pause();
+      }
+
+      function resumeMusic() {
+        bgMusic.play().catch(() => {});
+      }
+    </script>
+  </body>
+</html>
