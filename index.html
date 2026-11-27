@@ -345,8 +345,8 @@
         },
         {
           j: "店員さんを見てください。何を持っていますか。",
-          qNormal: "Look at the staff. What is he holding",
-          aNormal: "He is holding an English menu.",
+          qNormal: "Look at the staff. What is she holding",
+          aNormal: "She is holding an English menu.",
           img: "assets/imageQ/G5U6 Starting Out/pictureD.png",
         },
 
@@ -387,6 +387,10 @@
         REVERSE: {
           img: "reverse.png",
           desc: "Students sitting down stand up while students standing up sit down <br>(すわっている人は立って、立っている人はすわってください。)",
+        },
+        EVERYONE: {
+          img: "everyone.png",
+          desc: "Everyone sits down<br>(全員が座る)",
         },
         // "REVERSE ROW": {
         //   img: "reverserow.png",
@@ -483,7 +487,11 @@
 
       function win() {
         chestSound.play().catch(() => {});
-        const keys = Object.keys(rewards);
+        const isLastQuestion =
+          currentQCount >= totalQuestions || currentPool.length === 0;
+        const keys = isLastQuestion
+          ? ["BOYS", "GIRLS", "ONLY ME", "EVERYONE"]
+          : Object.keys(rewards).filter((k) => k !== "EVERYONE");
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         const reward = rewards[randomKey];
 
