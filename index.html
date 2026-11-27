@@ -392,6 +392,10 @@
           img: "everyone.png",
           desc: "Everyone sits down<br>(全員が座る)",
         },
+         CHAMPION: {
+          img: "champion.png",
+          desc: "Everyone stands up except the person who answered<br>(答えた人以外は、全員が立つ)",
+        },
         // "REVERSE ROW": {
         //   img: "reverserow.png",
         //   desc: "Everyone sits down except row group <br>(答えた人の列以外は、みんな座りましょう。)",
@@ -491,7 +495,7 @@
           currentQCount >= totalQuestions || currentPool.length === 0;
         const keys = isLastQuestion
           ? ["BOYS", "GIRLS", "ONLY ME", "EVERYONE"]
-          : Object.keys(rewards).filter((k) => k !== "EVERYONE");
+          : Object.keys(rewards).filter((k) => k !== "EVERYONE" && k !== "CHAMPION");
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         const reward = rewards[randomKey];
 
