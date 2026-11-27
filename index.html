@@ -494,7 +494,7 @@
         const isLastQuestion =
           currentQCount >= totalQuestions || currentPool.length === 0;
         const keys = isLastQuestion
-          ? ["BOYS", "GIRLS", "ONLY ME", "EVERYONE"]
+          ? ["BOYS", "GIRLS", "CHAMPION", "EVERYONE"]
           : Object.keys(rewards).filter((k) => k !== "EVERYONE" && k !== "CHAMPION");
         const randomKey = keys[Math.floor(Math.random() * keys.length)];
         const reward = rewards[randomKey];
